@@ -31,6 +31,15 @@
         </div>
     </div>
 
+    <div class="alert alert-success alert-dismissible fade show" th:if="${ok}">
+        <span th:text="${ok}">Operación realizada</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <a class="btn btn-primary mb-3" th:href="@{/productos/nuevo}">
+        Nuevo producto
+    </a>
+
     <!-- Sin resultados -->
     <div class="alert alert-warning" th:if="${productos.isEmpty()}">
         <i class="bi bi-exclamation-triangle me-2"></i>
@@ -83,11 +92,25 @@
                         </small>
                     </div>
 
-                    <a class="btn btn-outline-primary btn-sm mt-3"
-                       th:href="@{/productos/{id}(id=${p.id})}">
-                        Ver detalle
-                        <i class="bi bi-arrow-right ms-1"></i>
-                    </a>
+                    <div class="d-flex gap-1 mt-3">
+                        <a class="btn btn-outline-primary btn-sm flex-fill"
+                           th:href="@{/productos/{id}(id=${p.id})}">
+                            Ver detalle
+                            <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                        <a class="btn btn-outline-warning btn-sm"
+                           th:href="@{/productos/{id}/editar(id=${p.id})}">
+                            Editar
+                        </a>
+                        <button type="button"
+                                class="btn btn-outline-danger btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalEliminar"
+                                th:data-id="${p.id}"
+                                th:data-nombre="${p.nombre}">
+                            Eliminar
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -97,6 +120,47 @@
 
 <footer th:replace="~{fragments/header :: footer}"></footer>
 
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <form id="formEliminar" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle text-danger me-2"></i>
+                        Confirmar eliminacion
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Seguro que queres eliminar el producto
+                    <strong id="nombreModal"></strong>?
+                    <br>
+                    <small class="text-muted">Esta accion no se puede deshacer.</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i>Si, eliminar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- JavaScript del modal -->
+<script>
+    document.getElementById('modalEliminar').addEventListener('show.bs.modal', event => {
+        const btn = event.relatedTarget;
+        const id = btn.getAttribute('data-id');
+        const nombre = btn.getAttribute('data-nombre');
+        document.getElementById('formEliminar').action = '/productos/' + id + '/eliminar';
+        document.getElementById('nombreModal').textContent = nombre;
+    });
+</script>
 </body>
 </html>

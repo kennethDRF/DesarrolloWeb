@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${producto.id == null} ? 'Nuevo producto' : 'Editar producto'">Producto</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="bg-light">
+
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<main class="container my-4">
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/productos">Productos</a></li>
+            <li class="breadcrumb-item active"
+                th:text="${producto.id == null} ? 'Nuevo' : 'Editar'">Nuevo</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">
+                <i class="bi bi-box me-2"></i>
+                <span th:text="${producto.id == null} ? 'Nuevo producto' : 'Editar producto'">Producto</span>
+            </h2>
+        </div>
+        <div class="card-body">
+
+            <div class="alert alert-danger" th:if="${#fields.hasErrors('producto.*')}">
+                <strong><i class="bi bi-exclamation-triangle me-1"></i>Corregi estos errores:</strong>
+                <ul class="mb-0 mt-2">
+                    <li th:each="err : ${#fields.allErrors('producto.*')}" th:text="${err}"></li>
+                </ul>
+            </div>
+
+            <form th:action="${producto.id == null} ? @{/productos} : @{/productos/{id}(id=${producto.id})}"
+                  th:object="${producto}"
+                  method="post">
+
+                <input type="hidden" th:field="*{id}">
+
+                <div class="mb-3">
+                    <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control"
+                           th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid'"
+                           th:field="*{nombre}">
+                    <div class="invalid-feedback" th:errors="*{nombre}">Error</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Descripcion</label>
+                    <textarea class="form-control" rows="3"
+                              th:classappend="${#fields.hasErrors('descripcion')} ? 'is-invalid'"
+                              th:field="*{descripcion}"></textarea>
+                    <div class="invalid-feedback" th:errors="*{descripcion}">Error</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Precio <span class="text-danger">*</span></label>
+                        <input type="number" step="0.01" min="0" class="form-control"
+                               th:classappend="${#fields.hasErrors('precio')} ? 'is-invalid'"
+                               th:field="*{precio}">
+                        <div class="invalid-feedback" th:errors="*{precio}">Error</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Stock <span class="text-danger">*</span></label>
+                        <input type="number" min="0" class="form-control"
+                               th:classappend="${#fields.hasErrors('stock')} ? 'is-invalid'"
+                               th:field="*{stock}">
+                        <div class="invalid-feedback" th:errors="*{stock}">Error</div>
+                        <small class="text-muted">No puede ser negativo</small>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Categoria</label>
+                    <input type="text" class="form-control"
+                           th:classappend="${#fields.hasErrors('categoria')} ? 'is-invalid'"
+                           th:field="*{categoria}">
+                    <div class="invalid-feedback" th:errors="*{categoria}">Error</div>
+                </div>
+
+                <hr>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-success">
+                        <i class="bi bi-check-circle me-1"></i>Guardar
+                    </button>
+                    <a href="/productos" class="btn btn-secondary">
+                        <i class="bi bi-x-circle me-1"></i>Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
