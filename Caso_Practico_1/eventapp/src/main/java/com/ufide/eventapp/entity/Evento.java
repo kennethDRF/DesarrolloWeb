@@ -8,18 +8,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
-/**
- * Entidad Evento - representa un evento publico (concierto, taller, charla...).
- *
- * NOTA IMPORTANTE para el Caso Practico 1:
- *   Esta entidad tiene los campos pero NO tiene validaciones.
- *   Como parte del examen tenes que aplicar las anotaciones de
- *   Bean Validation que veas necesarias (@NotBlank, @Size, @Future, etc).
- *
- *   Tampoco hay metodos util tipo isLleno() o isProximo() - si te sirven
- *   para la vista, podes agregarlos.
- */
 @Entity
 @Table(name = "eventos")
 public class Evento {
@@ -28,33 +23,40 @@ public class Evento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 120)
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 3, max = 100, message = "El nombre debe tener entre 3 y 100 caracteres")
+    @Column(nullable = false, length = 100)
     private String nombre;
 
+    @Size(max = 500, message = "La descripcion no debe pasar los 500 caracteres")
     @Column(length = 500)
     private String descripcion;
 
-    /** Fecha del evento (sin hora). */
+    @NotNull(message = "Debe indicar una fecha para el evento")
+    @Future(message = "La fecha debe ser posterior a hoy")
     @Column(nullable = false)
     private LocalDate fecha;
 
+    @NotBlank(message = "Indique el lugar del evento")
+    @Size(max = 100, message = "El lugar es demasiado largo")
     @Column(length = 100)
     private String lugar;
 
-    /** Categoria libre: "Musica", "Conferencia", "Deporte", "Taller", etc. */
+    @NotBlank(message = "Seleccione una categoria")
+    @Size(max = 50)
     @Column(length = 50)
     private String categoria;
 
+    @Size(max = 80)
     @Column(length = 80)
     private String organizador;
 
-    /** Cupo total disponible. */
+    @Min(value = 1, message = "Debe haber al menos 1 cupo")
     private int cupoMaximo;
 
-    /** Tickets ya vendidos. */
     private int cuposVendidos;
 
-    /** Precio de la entrada (0 si es gratis). */
+    @DecimalMin(value = "0.0", message = "El precio minimo es 0")
     private double precio;
 
     public Evento() {}
@@ -73,7 +75,18 @@ public class Evento {
         this.precio = precio;
     }
 
-    // Getters y setters
+    public boolean isCompleto() {
+        return cuposVendidos >= cupoMaximo;
+    }
+
+    public boolean isFuturo() {
+        return fecha != null && !fecha.isBefore(LocalDate.now());
+    }
+
+    public boolean isGratis() {
+        return precio == 0;
+    }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
